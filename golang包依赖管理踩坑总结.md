@@ -89,10 +89,12 @@ func main() {
 
 #### 2.1.1 注意：
 >1 如果出现godep: Package (github.com/xiezhenouc/golangwebframework) not found，说明golangwebframework根本没有下载到$GOPATH中，需要go get github.com/xiezhenouc/golangwebframework
+>
 >2 如果出现directory "directory "/Users/xiezhen/Documents/codes/golib/src/github.com/goinaction/code/chapter3/words" is not using a known version control system" is not using a known version control system，说明这个目录没有版本信息，自己可以cd到对应的目录下，git status看下，只通过git init无法解决这个问题，这个依赖的包必须有已经commit的信息才可以
 
 #### 2.1.2 总结
 >godep save成功 == 依赖的代码包在$GOPATH中&依赖的代码包有已经提交过的commit版本信息
+>
 >如果依旧不成功，建议每一步debug下
 
 ### 2.2 godep restore
@@ -107,6 +109,9 @@ func main() {
 
 #### 2.2.2 总结
 >godep restore成功 == 当前目录下有正确的Godeps/Godeps.json && 依赖的代码库可以checkout到Godeps.json中的版本上
+>
+>如果依旧不成功，建议每一步debug下
+
 
 
 
