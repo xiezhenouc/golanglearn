@@ -40,13 +40,13 @@ func main() {
 	searchTerm := ""
 
 	var dm DefaultMatcher
-	// 将值赋给指针类型
-	var matcher Matcher = dm
-	var matcherPointer Matcher = dm
 
 	// 使用值来调用方法, OK
+	var matcher Matcher = dm
 	_, _ = matcher.Search(feed, searchTerm)
+
 	// 使用指针调用方法, OK
+	var matcherPointer Matcher = &dm
 	_, _ = matcherPointer.Search(feed, searchTerm)
 
 }
@@ -88,21 +88,19 @@ func main() {
 	searchTerm := ""
 
 	var dm DefaultMatcher
-	// 将值赋给指针类型
-	var matcher Matcher = dm
-	var matcherPointer Matcher = &dm
 
 	// 使用值来调用方法, WARONG!
-	// !!!
+	var matcher Matcher = dm
 	_, _ = matcher.Search(feed, searchTerm)
 	// 使用指针调用方法, OK
+	var matcherPointer Matcher = &dm
 	_, _ = matcherPointer.Search(feed, searchTerm)
 
 }
 ```
 ```
 // 结构，构建失败
-➜  myhello go build
-./hello.go:31:6: cannot use dm (type DefaultMatcher) as type Matcher in assignment:
+go build fail
+./hello.go:33:6: cannot use dm (type DefaultMatcher) as type Matcher in assignment:
 	DefaultMatcher does not implement Matcher (Search method has pointer receiver)
 ```
