@@ -85,7 +85,7 @@ func main() {
 	]
 }
 ```
->vendor目录的内容是vendor/github.com/xiezhenouc/golangwebframework就是依赖包的源代码拷贝副本通过这个操作，依赖包已经放到自己的代码路径下了。
+>vendor目录的内容是vendor/github.com/xiezhenouc/golangwebframework就是依赖包的源代码拷贝副本。通过这个操作，依赖包已经放到自己的代码路径下了。
 
 #### 2.1.1 注意：
 >1 如果出现godep: Package (github.com/xiezhenouc/golangwebframework) not found，说明golangwebframework根本没有下载到$GOPATH中，需要go get github.com/xiezhenouc/golangwebframework
