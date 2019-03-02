@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	// 共享数据
+	// 共享数据，无缓冲通道
 	dataShare := make(chan int)
 
 	// m个生产者, n个消费者
