@@ -1,7 +1,7 @@
 # golang grpc 学习
 
 ## 1 依赖的基础环境
->需要依赖protobuf，访问https://github.com/protocolbuffers/protobuf/releases，找到合适版本
+>需要依赖protobuf，访问https://github.com/protocolbuffers/protobuf/releases  找到合适版本
 >解压，执行bin目录下的protoc二进制，查看是否可以用
 >如果可用，执行`ln protoc /usr/bin/protoc`，这样在任意目录均可用了
 
