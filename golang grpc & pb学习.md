@@ -1,7 +1,7 @@
 # golang grpc 学习
 
 ## 1 依赖的基础环境
->需要实现依赖于protobuf，访问https://github.com/protocolbuffers/protobuf/releases
+>需要依赖protobuf，访问https://github.com/protocolbuffers/protobuf/releases，找到合适版本
 >解压，执行bin目录下的protoc二进制，查看是否可以用
 >如果可用，执行`ln protoc /usr/bin/protoc`，这样在任意目录均可用了
 
@@ -48,7 +48,6 @@ message HiReply {
 
 ## 3 client
 >在自己的工程目录下新建client文件夹，在该文件夹下新建client.go文件，内容如下
->1 连接tcp server 2 根据proto文件拼装自己的请求，3 调用proto中的方法，4 解析结果
 
 ```
 package main
@@ -105,7 +104,6 @@ func main() {
 
 ## 4 server
 >在自己的工程目录下新建server文件夹，在该文件夹下新建server.go文件，内容如下
->1 启动一个tcp server 2 声明一个结构体，实现一个方法
 
 ```
 package main
