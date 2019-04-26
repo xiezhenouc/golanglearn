@@ -46,3 +46,17 @@ func main() {
 	fw.Run(":8999")
 }
 ```
+
+## 3 web界面
+```
+/debug/pprof/
+
+profiles:
+0	block (查看导致阻塞同步的堆栈跟踪)
+6	goroutine (查看当前所有运行的 goroutines 堆栈跟踪)
+9	heap (查看活动对象的内存分配情况)
+0	mutex (查看导致互斥锁的竞争持有者的堆栈跟踪)
+8	threadcreate (查看创建新OS线程的堆栈跟踪)
+
+full goroutine stack dump
+```
