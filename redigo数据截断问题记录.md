@@ -150,9 +150,9 @@ $45056
 +{"_action":"xxx","_callid":"0.4","_logid":xxx}.....
 ```
 >能够明显看到，原来封装的redis协议返回方式是单行回复，但是标准的Redis协议是多行回复，但多行回复后续为什么没有问题，只能再去看源码
-### 3.1.3 多行回复没有问题的原因--问题的答案
+### 3.1.3 `多行回复没有问题的原因--问题的答案`
 >请看关键点问题，可以明显看到，`p := make([]byte, n) _, err = io.ReadFull(c.br, p)`，这个就是将底层的buffer空间扩大了。然后再`c.readLine()`，所以就没有问题了
->但是在首次调用c.readLine()时候，如果是用单行回复，`+...`这种形式，且`c.readLine()`的内部实现是`ReadSlice`，则当单行回复的消息太大的时候，`ReadSlice`只能读取4096字节消息，问题的根因
+>但是在首次调用c.readLine()时候，如果是用单行回复，`+...`这种形式，且`c.readLine()`的内部实现是`ReadSlice`，则当单行回复的消息太大的时候，`ReadSlice`只能读取4096字节消息，`问题的根因`
 
 ```
 // redigo/redis/conn.go
@@ -199,7 +199,7 @@ func (c *conn) readReply() (interface{}, error) {
 		}
 ...
 ```
-### 3.1.4 代码
+### 3.1.4 复现代码
 
 ```
 package main
@@ -234,7 +234,9 @@ func main() {
 
 ## 3.2 redis monitor模式复现
 >在网上查询这个问题的时候，发现新的版本已经修复了。具体的issue为`https://github.com/gomodule/redigo/issues/380`，PR为`https://github.com/gomodule/redigo/pull/381/files`
+>
 >issue的主要问题是使用了redis的monitor功能
+>
 >redis monitor功能介绍，主要是能看到redis的操作记录
 
 ```
@@ -309,10 +311,26 @@ func (c *conn) readReply() (interface{}, error) {
 }
 ```
 
+>启动一个python，写入一个大于4k的内容，代码如下
+
+```
+// test.py
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import redis
+r = redis.Redis(host='127.0.0.1', port=6379, db=0)
+mystr = '11221122112211221122112211221122112211221122'
+for i in range(10):
+    mystr += mystr
+
+print len(mystr)
+ret = r.set('xxx', mystr)
+```
+
 >将monitor模式下server返回打印出来，结果如下
 
 ```
-+1556622707.140954 [0 127.0.0.1:35436] "SET" "netdisk_filesearch_1" "1122.......
++1556622707.140954 [0 127.0.0.1:35436] "SET" "xxx" "1122.......
 bufio: buffer full
 redigo: long response line (possible server error or unsupported concurrent read by application)
 ```
