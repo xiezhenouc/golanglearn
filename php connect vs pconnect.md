@@ -72,5 +72,57 @@ echo 'hi';
 
 >所以使用pconnect代替connect，可以减少频繁建立redis连接的消耗。
 
+## 补充文档
+>pconnect文档说明 https://github.com/phpredis/phpredis#pconnect-popen
 
+```
+pconnect, popen
+Description: Connects to a Redis instance or reuse a connection already established with pconnect/popen.
+（复用连接）
 
+The connection will not be closed on end of request until the php process ends. So be prepared for too many open FD's errors (specially on redis server side) when using persistent connections on many servers connecting to one redis server.
+（除非php进程关闭，否则连接不会被断掉；有可能发生FD过多错误）
+
+Also more than one persistent connection can be made identified by either host + port + timeout or host + persistent_id or unix socket + timeout.
+
+Starting from version 4.2.1, it became possible to use connection pooling by setting INI variable redis.pconnect.pooling_enabled to 1.
+（配置）
+
+This feature is not available in threaded versions. pconnect and popen then working like their non persistent equivalents.
+```
+
+## 补充源代码
+>可以明显看到connect和pconnect本质上调用的是同一个函数redis_connect，注意关键字persistent，这个代表是否复用连接
+>
+>https://github.com/phpredis/phpredis/blob/develop/redis.c
+
+```c
+PHP_METHOD(Redis, connect)
+{
+    if (redis_connect(INTERNAL_FUNCTION_PARAM_PASSTHRU, 0) == FAILURE) {
+        RETURN_FALSE;
+    } else {
+        RETURN_TRUE;
+    }
+}
+/* }}} */
+
+/* {{{ proto boolean Redis::pconnect(string host, int port [, double timeout])
+ */
+PHP_METHOD(Redis, pconnect)
+{
+    if (redis_connect(INTERNAL_FUNCTION_PARAM_PASSTHRU, 1) == FAILURE) {
+        RETURN_FALSE;
+    } else {
+        RETURN_TRUE;
+    }
+}
+/* }}} */
+```
+```
+PHP_REDIS_API int
+redis_connect(INTERNAL_FUNCTION_PARAMETERS, int persistent)
+{
+...
+}
+```
