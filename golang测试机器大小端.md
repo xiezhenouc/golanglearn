@@ -59,7 +59,7 @@ func main() {
 ## 3 GDB调试
 >可以通过GDB调试进行查看，明显可以看到内存里面的数据是如何分布的
 >
-> b n设置断点 break n；r开始执行 run；n执行下一步 next；p打印 print
+> b n设置断点 break n；r开始执行 run；n执行下一步 next；p打印 print; 
 >
 >x 是GDB中用来检查内存的命令，其使用方法是：
 >
@@ -121,3 +121,6 @@ $ od -c tmp
 0000000   a   b   c   d  \n
 0000005
 ```
+
+>ulimit -c unlimited 打开core dump
+
