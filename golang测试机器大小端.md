@@ -7,10 +7,15 @@
 >小端模式，是指数据的高位，保存在内存的高地址中，而数据的低位，保存在内存的低地址中；
 >
 >如下图所示
+![大小端说明](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/%E5%A4%A7%E5%B0%8F%E7%AB%AF.png)
+
 
 ## 分析
 >可以通过很多方式查看机器的大小端
 >写一个代码，测试下
+
+![内存布局](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80.png)
+
 
 ## 1 查看系统文件
 
