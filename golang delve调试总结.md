@@ -50,7 +50,7 @@ func main() {
 >此处以调试源代码为例
 
 ```
-#dlv exec ./test
+dlv debug hello.go
 ```
 
 >1 在main函数处设置断点
