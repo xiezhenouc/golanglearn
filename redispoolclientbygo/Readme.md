@@ -5,6 +5,7 @@
 ## 2 文件说明
 > go run main.go 执行简单例子
 
+```
 |____main.go pool的简单使用
 |____Readme.md
 |____redis 
@@ -13,6 +14,7 @@
 | |____pool.go        // pool实现
 | |____pool_test.go   
 | |____redis.go       // Conn接口
+```
 
 ## 3 测试用例运行
 
