@@ -1,4 +1,5 @@
 # net/http包初探
+
 >背景：同事遇到了一个问题，发现当用"Content-Type:application/x-www-form-urlencoded"进行HTTP请求的时候，程序异常退出了，最终的原因是他用的网络框架对request body处理有问题，导致异常退出。
 >
 >通过这个例子，想要探索下net/http一次完整http请求的全过程。我们将通过dlv进行一步步的调试。注意多个goroutines同时存在时候的调试。
@@ -363,7 +364,7 @@ net/textproto.MIMEHeader [
   2250:			w.WriteHeader(StatusBadRequest)
 ```
 
-> 可以看到这个函数的具体实现，h, _ := mux.Handler(r)将会取到具体的函数，然后执行server
+> 可以看到这个函数的具体实现，h, _ := mux.Handler(r)将会取到具体的函数，然后执行ServeHTTP
 
 ```golang
 // ServeHTTP dispatches the request to the handler whose
@@ -530,4 +531,27 @@ func (b *Writer) Flush() error {
 "ngth: 14\r\nContent-Type: text/plain; charset=utf-8\r\n\r\nHello, worl"
 (dlv) p string(b.buf[128:])
 "d!1\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+```
+
+>client返回
+
+```
+➜  ~ curl -v "http://127.0.0.1:8080/hello" -X POST -d "a=1" -H "Content-Type:application/x-www-form-urlencoded"
+*   Trying 127.0.0.1...
+* Connected to 127.0.0.1 (127.0.0.1) port 8080 (#0)
+> POST /hello HTTP/1.1
+> Host: 127.0.0.1:8080
+> User-Agent: curl/7.43.0
+> Accept: */*
+> Content-Type:application/x-www-form-urlencoded
+> Content-Length: 3
+>
+* upload completely sent off: 3 out of 3 bytes
+< HTTP/1.1 200 OK
+< Date: Fri, 17 May 2019 06:58:37 GMT
+< Content-Length: 14
+< Content-Type: text/plain; charset=utf-8
+<
+* Connection #0 to host 127.0.0.1 left intact
+Hello, world!1%
 ```
