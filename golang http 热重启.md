@@ -230,6 +230,29 @@ hello world fff
 ```
 
 ## 2 go1.8 Shutdown源码
+>简介
+
+> Shutdown 方法会在不干扰任何活跃连接的情况下关闭服务器。首先，它会关闭所有开着的监听器，然后关闭所有空闲连接，接着无限等待所有连接变成空闲状态，最后关闭。
+
+>如果提供的 context.Context 对象在关闭完成之前过期了，那么，Shutdown 方法返回该 Context 对象的错误信息。否则，它会将正在关闭的服务器的底层监听器的错误返回（如果有的话）。
+
+>一旦调用了 Shutdown 方法，Serve、ListenAndServe 和 ListenAndServeTLS 会立即返回 ErrServerClosed。需要确保程序不退出，而是等待 Shutdown 返回。
+
+>Shutdown 并不会像 WebSockets 那样尝试关闭或者等待被劫持的连接。Shutdown 的调用者应该在需要的时候，挨个通知这些长期存在的连接关闭，并且等待它们关闭。
+
+
+> 步骤
+
+> 1 将 Server 的字段 inShutdown int32 加一。这个字段用于 Server 非公开方法 shuttingDown 中，非零表示 Server 正在关闭。
+
+> 2 调用 closeListenersLocked 方法，关闭所有打开的监听器。
+
+> 3 调用 closeDoneChanLocked 方法，关闭 doneChan chan struct{}。从而通知 Serve、ListenAndServe 和 ListenAndServeTLS 退出并返回 ErrServerClosed 错误。
+
+> 4 将所有使用 RegisterOnShutdown 方法注册的方法（保存在 onShutdown []func() 中）放在单独的 goroutine 中调用，并且不等待方法返回。这些方法不应该等待关闭完成。
+
+> 5 创建一个定时器，定时时间由 shutdownPollInterval 指定，默认是 500ms。目前没有可以修改该值的方法。
+每到步骤 5 创建的定时时间调用一次 closeIdleConns 方法关闭空闲连接。无限循环直到该方法返回 true（表示服务器已经处于静默模式），或者当 ctx 过期了。如果是前者，则返回步骤 2 的执行结果。后者则返回 ctx 的错误信息。
 
 ```golang
 // 500ms检查一次是否还有idle connections
