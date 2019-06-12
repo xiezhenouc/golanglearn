@@ -230,4 +230,239 @@ hello world fff
 ```
 
 ## 2 go1.8 Shutdown源码
->todo
+
+```golang
+// 500ms检查一次是否还有idle connections
+var shutdownPollInterval = 500 * time.Millisecond
+
+// Shutdown gracefully shuts down the server without interrupting any
+// active connections. Shutdown works by first closing all open
+// listeners, then closing all idle connections, and then waiting
+// indefinitely for connections to return to idle and then shut down.
+// If the provided context expires before the shutdown is complete,
+// Shutdown returns the context's error, otherwise it returns any
+// error returned from closing the Server's underlying Listener(s).
+//
+// When Shutdown is called, Serve, ListenAndServe, and
+// ListenAndServeTLS immediately return ErrServerClosed. Make sure the
+// program doesn't exit and waits instead for Shutdown to return.
+//
+// Shutdown does not attempt to close nor wait for hijacked
+// connections such as WebSockets. The caller of Shutdown should
+// separately notify such long-lived connections of shutdown and wait
+// for them to close, if desired.
+func (srv *Server) Shutdown(ctx context.Context) error {
+    // 数字1 标记当前处于正在退出状态， func (s *Server) shuttingDown() bool函数会判断这个值
+	atomic.AddInt32(&srv.inShutdown, 1)
+	defer atomic.AddInt32(&srv.inShutdown, -1)
+
+	srv.mu.Lock()
+    // 将listen fd进行关闭，新连接无法建立，l.Accept() 将失败
+    lnerr := srv.closeListenersLocked()
+    
+    // 把server.go的done chan给close掉，将Serve()主函数退出，不再接受新请求 return ErrServerClosed
+    srv.closeDoneChanLocked()
+    
+    // 如果注册了shutdown的回调方法，执行回调方法
+	for _, f := range srv.onShutdown {
+		go f()
+	}
+	srv.mu.Unlock()
+
+	ticker := time.NewTicker(shutdownPollInterval)
+	defer ticker.Stop()
+	for {
+        // 关闭空闲连接
+		if srv.closeIdleConns() {
+			return lnerr
+		}
+		select {
+        // ctx 超时，直接退出
+		case <-ctx.Done():
+            return ctx.Err()
+        // 每500ms检查一下idle
+		case <-ticker.C:
+		}
+	}
+}
+
+// 判断是否需要http长连接 or 判断是否处于关闭状态
+func (s *Server) doKeepAlives() bool {
+	return atomic.LoadInt32(&s.disableKeepAlives) == 0 && !s.shuttingDown()
+}
+
+// 判断server是否处于正在退出状态
+func (s *Server) shuttingDown() bool {
+	return atomic.LoadInt32(&s.inShutdown) != 0
+}
+
+// 将listen fd进行关闭，新连接无法建立
+func (s *Server) closeListenersLocked() error {
+	var err error
+	for ln := range s.listeners {
+		if cerr := ln.Close(); cerr != nil && err == nil {
+			err = cerr
+		}
+		delete(s.listeners, ln)
+	}
+	return err
+}
+
+// 执行closeListenersLocked后，l.Accept()无法建立连接，直接返回close
+func (srv *Server) Serve(l net.Listener) error {
+    ...
+	baseCtx := context.Background() // base is always background, per Issue 16220
+	ctx := context.WithValue(baseCtx, ServerContextKey, srv)
+	for {
+        // 当执行closeListenersLocked后，e返回错误
+		rw, e := l.Accept()
+		if e != nil {
+			select {
+            // 把server.go的done chan给close掉，将Serve()主函数退出，不再接受新请求 return ErrServerClosed
+			case <-srv.getDoneChan():
+				return ErrServerClosed
+			default:
+			}
+			...
+			return e
+		}
+		tempDelay = 0
+		c := srv.newConn(rw)
+        c.setState(c.rwc, StateNew) // before Serve can return
+        // 每一个连接单独启一个goroutine
+		go c.serve(ctx) 
+	}
+}
+
+// get done chan
+func (s *Server) getDoneChanLocked() chan struct{} {
+	if s.doneChan == nil {
+		s.doneChan = make(chan struct{})
+	}
+	return s.doneChan
+}
+
+// 把server.go的done chan给close掉，将Serve()主函数退出，不再接受新请求 return ErrServerClosed
+func (s *Server) closeDoneChanLocked() {
+	ch := s.getDoneChanLocked()
+	select {
+	case <-ch:
+		// Already closed. Don't close again.
+	default:
+		// Safe to close here. We're the only closer, guarded
+		// by s.mu.
+		close(ch)
+	}
+}
+
+// 关闭所有空闲连接，注意！是空闲连接，正在使用中的连接不会关闭
+// closeIdleConns closes all idle connections and reports whether the
+// server is quiescent.
+func (s *Server) closeIdleConns() bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	quiescent := true
+	for c := range s.activeConn {
+		st, ok := c.curState.Load().(ConnState)
+		if !ok || st != StateIdle {
+			quiescent = false
+			continue
+		}
+		c.rwc.Close()
+		delete(s.activeConn, c)
+	}
+	return quiescent
+}
+
+// net/net.go 关闭fd
+// Close closes the connection.
+func (c *conn) Close() error {
+	if !c.ok() {
+		return syscall.EINVAL
+	}
+	err := c.fd.Close()
+	if err != nil {
+		err = &OpError{Op: "close", Net: c.fd.net, Source: c.fd.laddr, Addr: c.fd.raddr, Err: err}
+	}
+	return err
+}
+
+// 一个connection的完整生命周期
+// Serve a new connection.
+func (c *conn) serve(ctx context.Context) {
+    ...
+    ctx = context.WithValue(ctx, LocalAddrContextKey, c.rwc.LocalAddr())
+    ...
+
+	// HTTP/1.x from here on.
+	ctx, cancelCtx := context.WithCancel(ctx)
+	c.cancelCtx = cancelCtx
+	defer cancelCtx()
+
+	c.r = &connReader{conn: c}
+	c.bufr = newBufioReader(c.r)
+	c.bufw = newBufioWriterSize(checkConnErrorWriter{c}, 4<<10)
+
+	for {
+        // 读取请求
+		w, err := c.readRequest(ctx)
+
+		c.curReq.Store(w)
+
+        // 执行业务逻辑
+		// HTTP cannot have multiple simultaneous active requests.[*]
+		// Until the server replies to this request, it can't read another,
+		// so we might as well run the handler in this goroutine.
+		// [*] Not strictly true: HTTP pipelining. We could let them all process
+		// in parallel even if their responses need to be serialized.
+		// But we're not going to implement HTTP pipelining because it
+		// was never deployed in the wild and the answer is HTTP/2.
+		serverHandler{c.server}.ServeHTTP(w, w.req)
+		w.cancelCtx()
+		if c.hijacked() {
+			return
+        }
+        
+        // 结束请求
+		w.finishRequest()
+
+        // 连接设置为空闲
+		c.setState(c.rwc, StateIdle)
+		c.curReq.Store((*response)(nil))
+
+        // 处于shutdown模式下，协程退出，完成对请求方的响应
+		if !w.conn.server.doKeepAlives() {
+			// We're in shutdown mode. We might've replied
+			// to the user without "Connection: close" and
+			// they might think they can send another
+			// request, but such is life with HTTP/1.1.
+			return
+		}
+        ... 
+	}
+}
+
+// server向请求方发送数据
+func (w *response) finishRequest() {
+	w.handlerDone.setTrue()
+
+	if !w.wroteHeader {
+		w.WriteHeader(StatusOK)
+	}
+
+	w.w.Flush()
+	putBufioWriter(w.w)
+	w.cw.close()
+	w.conn.bufw.Flush()
+
+	w.conn.r.abortPendingRead()
+
+	// Close the body (regardless of w.closeAfterReply) so we can
+	// re-use its bufio.Reader later safely.
+	w.reqBody.Close()
+
+	if w.req.MultipartForm != nil {
+		w.req.MultipartForm.RemoveAll()
+	}
+}
+```
