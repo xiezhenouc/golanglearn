@@ -466,3 +466,36 @@ func (w *response) finishRequest() {
 	}
 }
 ```
+
+> 对比看下Close，也就是不优雅关闭
+
+```golang
+// Close immediately closes all active net.Listeners and any
+// connections in state StateNew, StateActive, or StateIdle. For a
+// graceful shutdown, use Shutdown.
+//
+// Close does not attempt to close (and does not even know about)
+// any hijacked connections, such as WebSockets.
+//
+// Close returns any error returned from closing the Server's
+// underlying Listener(s).
+func (srv *Server) Close() error {
+	srv.mu.Lock()
+    defer srv.mu.Unlock()
+    // 把server.go的done chan给close掉，将Serve()主函数退出，不再接受新请求 return ErrServerClosed
+    srv.closeDoneChanLocked()
+    // 将listen fd进行关闭，新连接无法建立，l.Accept() 将失败
+	err := srv.closeListenersLocked()
+	for c := range srv.activeConn {
+        // mention ! 直接关闭，不管请求是否已经完成
+		c.rwc.Close()
+		delete(srv.activeConn, c)
+	}
+	return err
+}
+```
+>二者对比如下
+>
+>Shutdown 方法会调用注册的关闭时执行的方法，而 Close 方法没有。
+>
+>Shutdown 方法会等待所有活跃连接变成 idle 状态才关闭连接，而 Close 方法则直接关闭连接。
