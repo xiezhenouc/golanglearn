@@ -68,7 +68,7 @@ func main() {
 
 >汇编代码
 
-```golang
+```
     // main函数声明，栈帧 232个字节
 	0x0000 00000 (test.go:7)	TEXT	"".main(SB), $232-0
 
