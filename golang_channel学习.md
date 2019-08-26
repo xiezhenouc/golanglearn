@@ -1,6 +1,8 @@
-1 并发模型
-1.1 并发与并行
+# 1 并发模型
+## 1.1 并发与并行
+```
 摩尔定律，每年晶体管和电阻数量double
+
 阿姆达尔定律，一个程序能从并行上获得性能提升的上限取决于有多少代码必须写成串行的
 
 并发可能造成的问题
@@ -20,20 +22,23 @@
 Concurrency is a property of the code; parallelism is a property of the running program.
 
 goroutine抽象于线程之上
-
-1.2 什么是CSP
+```
+## 1.2 什么是CSP
+```
 进程间通信
 多线程+内存同步访问，通过加锁在大型项目中容易出现各种问题
 goroutine = 线程
 channel = mutex（内存同步访问）
-
-2 什么是channel
+```
+# 2 什么是channel
+```
 goroutine用于并发执行任务
 channel用于goroutine之前的同步和通信，是goroutine间的管道
 
 不要通过共享内存来通信，而要通过通信来实现内存共享
-
-2.1 channel实现CSP
+```
+## 2.1 channel实现CSP
+```
 chan T 		声明一个双向通道
 chan<- t 	声明一个只用于发送的通道
 <-chan T    声明一个只用于接收的通道
@@ -41,16 +46,17 @@ chan<- t 	声明一个只用于发送的通道
 channel是引用类型，空值是nil，make初始化
 
 缓存型vs非缓冲型
+```
+# 3 为什么要用channel
+>channel+goroutine，业务开发简单
 
-3 为什么要用channel
-channel+goroutine，业务开发简单
-
-4 channel实现原理
+# 4 channel实现原理
+```
 chan的发送和接收，在编译期间转换成底层的发送和接收函数
 不带缓冲的chan = 同步模式
 带缓冲的chan = 异步模式
-
-4.1 数据结构
+```
+## 4.1 数据结构
 ```
 type hchan struct {
 	// chan里元素数量
@@ -85,7 +91,7 @@ type waitq struct {
 	last  *sudog
 }
 ```
-4.2 创建
+## 4.2 创建
 ```
 	// 无缓冲channel
 	ch := make(chan int)
@@ -137,7 +143,7 @@ func makechan(t *chantype, size int64) *hchan {
 }
 
 ```
-4.3 接收
+## 4.3 接收
 通过汇编找到接收函数入口，两种形式，一种带ok，另外一种不带
 ```
 // entry points for <- c from compiled code
@@ -393,18 +399,20 @@ P 是 context，保存 goroutine 运行所需要的上下文，它还维护了�
 G 则是待运行的 goroutine。
 M 和 P 是 G 运行的基础。
 
-4.4 发送
-4.5 关闭
 
-5 channel进阶
-5.1 发送和接收元素的本质
-5.2 资源泄露
-5.3 happened before
-5.4 如何优雅地关闭channel
-5.5 关闭的Channel仍能读出数据
+## 4.4 发送
 
-6 channel应用
-6.1 停止信号
-6.2 任务定时
-6.3 解耦生产方和消费方
-6.4 控制并发数
+## 4.5 关闭
+
+# 5 channel进阶
+## 5.1 发送和接收元素的本质
+## 5.2 资源泄露
+## 5.3 happened before
+## 5.4 如何优雅地关闭channel
+## 5.5 关闭的Channel仍能读出数据
+
+# 6 channel应用
+## 6.1 停止信号
+## 6.2 任务定时
+## 6.3 解耦生产方和消费方
+## 6.4 控制并发数
