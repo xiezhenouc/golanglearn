@@ -42,9 +42,11 @@ goroutine vs 线程
 Go runtime负责goroutine的生老病死，从创建到销毁，一手包办
 
 Runtime在启动的时候，会申请M个线程，之后创建的N个goroutine都依附在这M个线程上执行，这就是M:N模型
+```
 
 ![M:N模型说明](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/MN%E6%A8%A1%E5%9E%8B.png)
 
+```
 在同一个时刻上，一个thread上只有一个goroutine上运行，当goroutine发生阻塞时，runtime会把goroutine调度走
 ```
 
@@ -103,15 +105,17 @@ Go程序启动后，会给每个逻辑核心分配一个P，同时会给每一�
 
 全局可运行队列(GRQ) 存储global runnable goroutine
 本地可运行队列(LRQ) 存储local runnable goroutine
+```
 
 ![GPM](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/GPM.png)
 
+```
 os scheduler 抢占式调度
 go scheduler 协作式调度，但是由runtime调度，实际在用户程序层面，可以理解成抢占式
 
+```
 ![gpm_workflow](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/gpm_workflow.png)
 
-```
 
 ## 8 调度时机
 
@@ -131,30 +135,34 @@ Go scheduler的职责就是将所有处于runnable的goroutines均匀分布在P�
 M:N模型，任何一个时刻，M个goroutines(G)分配到N个内核线程(M)上执行，这些内核线程跑在最多GOMAXPROCS的逻辑处理器P上。
 每个M必须依附一个P，每个P同一时刻只能运行一个M。
 如果P上的M阻塞了，其他的M依附在这个P上，继续执行这个P上的LRQ。
+```
 
 ![gpm2] (https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/gpm2.png)
 
+```
 实际上，go scheduler每一轮调度要做的工作就是找到处于runnable的goroutine，并执行它。
 
 找到顺序
 1 检查LRQ
 2 如果LRQ空了，找GRQ
 3 如果GRQ空了，work-stealing 其他P的LRQ
-
+```
 ![steal](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/steal.png)
 
-```
 
 ## 10 同步异步系统调用
 ```
 当G需要进行系统调用时，根据调用的类型，它所依附的M有两种情况 同步和异步
 
 对于同步的情况，M会被阻塞，进而从P上调度下来，G依然依附于M。之后新M依附于P，继续执行P上的LRQ。当G上的系统调用结束后，G再次加入LRQ中。
+```
 
 ![同步](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/同步.png)
 
+```
 对于异步的情况，M不会被阻塞，G的异步请求会被绑定到 network poller，等到系统调用结束，G才会重新回到P上。M没有被阻塞，可以继续执行P上的LRQ。
 
+```
 ![异步](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/异步.png)
 
 ```
