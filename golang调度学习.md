@@ -137,7 +137,7 @@ M:N模型，任何一个时刻，M个goroutines(G)分配到N个内核线程(M)�
 如果P上的M阻塞了，其他的M依附在这个P上，继续执行这个P上的LRQ。
 ```
 
-![gpm2] (https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/gpm2.png)
+![gpm2](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/gpm2.png)
 
 ```
 实际上，go scheduler每一轮调度要做的工作就是找到处于runnable的goroutine，并执行它。
