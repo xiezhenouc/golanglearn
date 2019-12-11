@@ -74,7 +74,7 @@ go get foo@e3702bed2
 
 
 4 gomodlib库有更新
-4.1 gomodlib中拉一个hello分支，新增一个函数，将其提交
+4.1 gomodlib中拉一个hello分支，新增一个函数，将其提交并合入
 func Hello() {
     println("hello")
 }
@@ -100,7 +100,7 @@ hi
 hello
 
 5 本地开发
-5.1 本地gomodlib中，再次新增一个函数，先不其提交
+5.1 本地gomodlib中，再次新增一个函数，先不提交
 func Haha() {
     println("haha")
 }
@@ -128,7 +128,23 @@ hello
 haha
 ```
 
+## 基本命令
+```
+1 初始化
+go mod init github.com/xiezhenouc/gomodtest
+2 清空缓存
+go clean --modcache
+3 整理&下载依赖
+go mod tidy
+4 更新某个分支、版本
+go get github.com/xiezhenouc/gomodlib@hello
+go get foo@v1.2.3
+go get foo@master
+go get foo@e3702bed2
+5 开发环境
+replace github.com/xiezhenouc/gomodlib => /home/work/tmp/gomod/gomodlib
 
+```
 
 
 ## 参考资料
