@@ -317,13 +317,11 @@ func main() {
 ### 3.2 基础类型说明
 
 ```golang
-// go map header
 // A header for a Go map.
 type hmap struct {
-	// Note: the format of the Hmap is encoded in ../../cmd/internal/gc/reflect.go and
-    // ../reflect/type.go. Don't change this structure without also changing that code!
-    // map大小
-	count     int // # live cells == size of map.  Must be first (used by len() builtin)
+	// 元素个数，调用 len(map) 时，直接返回此值
+	count     int
+	// buckets 的对数 log_2
 	flags     uint8
 	B         uint8  // log_2 of # of buckets (can hold up to loadFactor * 2^B items)
 	noverflow uint16 // approximate number of overflow buckets; see incrnoverflow for details
