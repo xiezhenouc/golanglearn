@@ -60,3 +60,78 @@ profiles:
 
 full goroutine stack dump
 ```
+
+## 4 火焰图
+>业务代码
+
+```golang
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	_ "net/http/pprof"
+	"time"
+)
+
+var tz *time.Location
+
+func main() {
+	go func() {
+		for {
+			LocalTz()
+
+			doSomething([]byte(`{"a": 1, "b": 2, "c": 3}`))
+		}
+	}()
+
+	fmt.Println("start api server...")
+	panic(http.ListenAndServe(":8080", nil))
+}
+
+func doSomething(s []byte) {
+	var m map[string]interface{}
+	err := json.Unmarshal(s, &m)
+	if err != nil {
+		panic(err)
+	}
+
+	s1 := make([]string, 0)
+	s2 := ""
+	for i := 0; i < 100; i++ {
+		s1 = append(s1, string(s))
+		s2 += string(s)
+	}
+}
+
+func LocalTz() *time.Location {
+	if tz == nil {
+		tz, _ = time.LoadLocation("Asia/Shanghai")
+	}
+	return tz
+}
+```
+
+>数据采集
+
+```
+go tool pprof http://127.0.0.1:8080/debug/pprof/profile -seconds 10
+
+...
+Saved profile in /Users/xxx/pprof/pprof.samples.cpu.001.pb.gz
+```
+
+>结果再输出
+
+```
+go tool pprof -http=:8081 /Users/xxx/pprof/pprof.samples.cpu.001.pb.gz
+```
+
+>火焰图
+
+![火焰图](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/火焰图.png)
+
+>图中，从上往下是方法的调用栈，长度代表cpu时长
+
+>可以看出 LocalTz() 函数占据了 50% cpu，开销非常惊人，快速定位到此函数
