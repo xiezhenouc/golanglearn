@@ -318,4 +318,4 @@ G需要在M上运行，M依赖P提供的资源，P则持有待运行的G。
 M从与它绑定的P的本地队列获取可运行的G，也会从network poller获取可运行的G，还会从其他P偷G。
 
 ```
-![三足鼎立](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/三足鼎立.png)
+![三足鼎立](https://raw.githubusercontent.com/xiezhenouc/golanglearn/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/三足鼎立.png)

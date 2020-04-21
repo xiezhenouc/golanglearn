@@ -35,7 +35,7 @@ name | 价格 |  数量
 
 >示意图如图所示
 
-![B tree说明](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/B树示意图.png)
+![B tree说明](https://raw.githubusercontent.com/xiezhenouc/golanglearn/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/B树示意图.png)
 
 >搜索的伪代码如下
 
@@ -72,7 +72,7 @@ data = BTree_Search(root, my_key);
 
 >示意图
 
-![B+ tree说明](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/B加树示意图.png)
+![B+ tree说明](https://raw.githubusercontent.com/xiezhenouc/golanglearn/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/B加树示意图.png)
 
 >从图中可以看到叶节点大小和内节点大小可能不同
 
@@ -80,7 +80,7 @@ data = BTree_Search(root, my_key);
 
 >带有顺序访问指针的B+Tree，提升区间搜索的性能
 
-![顺序访问 B+ tree说明](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/顺序访问B加树示意图.png)
+![顺序访问 B+ tree说明](https://raw.githubusercontent.com/xiezhenouc/golanglearn/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/顺序访问B加树示意图.png)
 
 ## 5 为什么要用B Tree 和 B+ Tree，不用二叉搜索树or红黑树
 >数据库存储的数据如果无法完整放到内存的时候，需要放到磁盘上
@@ -144,7 +144,7 @@ Send packet CA->Netherlands->CA 一个包的一次远程访问	150,000,000 ns
 ### 6.1 MyISAM
 >MyISAM引擎使用B+Tree作为索引结构，叶节点的data域存放的是数据记录的地址。下图是MyISAM索引的原理图
 
-![MyISAM](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/MyISAM.png)
+![MyISAM](https://raw.githubusercontent.com/xiezhenouc/golanglearn/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/MyISAM.png)
 
 >注意：索引文件和数据文件是分离的
 
@@ -154,14 +154,14 @@ Send packet CA->Netherlands->CA 一个包的一次远程访问	150,000,000 ns
 
 > 1 InnoDB的数据文件本身就是索引文件。在InnoDB中，表数据文件本身就是按B+Tree组织的一个索引结构。
 
-![InnoDB主键索引](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/InnoDB主键索引.png)
+![InnoDB主键索引](https://raw.githubusercontent.com/xiezhenouc/golanglearn/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/InnoDB主键索引.png)
 
 
 > 这棵树的叶节点data域保存了完整的数据记录。这个索引的key是数据表的主键，因此InnoDB表数据文件本身就是主索引。
 
 > 2 InnoDB的辅助索引data域存储相应记录主键的值而不是地址。换句话说，InnoDB的所有辅助索引都引用主键作为data域。
 
-![InnoDB辅助索引](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/InnoDB辅助索引.png)
+![InnoDB辅助索引](https://raw.githubusercontent.com/xiezhenouc/golanglearn/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/InnoDB辅助索引.png)
 
 >辅助索引搜索需要检索两遍索引：首先检索辅助索引获得主键，然后用主键到主索引中检索获得记录。
 
@@ -171,7 +171,7 @@ Send packet CA->Netherlands->CA 一个包的一次远程访问	150,000,000 ns
 >联合索引(a, b, c)，则从最左边开始匹配，mysql会一直向右匹配直到遇到范围查询(>、<、between、like)就停止匹配。
 
 >结构
-![联合索引](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/联合索引.png)
+![联合索引](https://raw.githubusercontent.com/xiezhenouc/golanglearn/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/联合索引.png)
 
 >只有一棵索引树
 

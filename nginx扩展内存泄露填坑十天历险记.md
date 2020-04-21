@@ -65,7 +65,7 @@ ngx_parse_url函数中有很多嵌套的新分配空间的代码，找不全。
 
 `宝贵的流程图`
 
-![nginx扩展内存泄露](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/nginx扩展内存泄露.png)
+![nginx扩展内存泄露](https://raw.githubusercontent.com/xiezhenouc/golanglearn/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/nginx扩展内存泄露.png)
 
 所以我们最后的思路，把ngx_reset_pool改为ngx_destroy_pool。因为update_servers中所有创建的空间，都是从这个pool出来的。
 

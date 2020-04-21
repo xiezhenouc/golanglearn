@@ -130,7 +130,7 @@ go tool pprof -http=:8081 /Users/xxx/pprof/pprof.samples.cpu.001.pb.gz
 
 >火焰图
 
-![火焰图](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/火焰图.png)
+![火焰图](https://raw.githubusercontent.com/xiezhenouc/golanglearn/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/火焰图.png)
 
 >图中，从上往下是方法的调用栈，长度代表cpu时长
 

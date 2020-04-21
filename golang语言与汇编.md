@@ -237,4 +237,4 @@ echo 'obase=2;137438953482' | bc
 ## 2.3 执行时候的示意图
 >下面这个时刻是add函数即将ret时候的状态图
 
-![栈帧说明](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/golang汇编栈帧.png)
+![栈帧说明](https://raw.githubusercontent.com/xiezhenouc/golanglearn/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/golang汇编栈帧.png)
