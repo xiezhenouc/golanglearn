@@ -8,7 +8,7 @@
 >
 >如下图所示
 
-![大小端说明](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/%E5%A4%A7%E5%B0%8F%E7%AB%AF.png)
+![大小端说明](https://raw.githubusercontent.com/xiezhenouc/golanglearn/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/%E5%A4%A7%E5%B0%8F%E7%AB%AF.png)
 
 
 ## 分析
@@ -95,7 +95,7 @@ $4 = (int16 *) 0xc420041eec
 0xc420041eef:   0x12
 ```
 
-![内存布局](https://github.com/xiezhenouc/golanglearn/blob/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80.png)
+![内存布局](https://raw.githubusercontent.com/xiezhenouc/golanglearn/master/%E5%9B%BE%E7%89%87%E8%AF%B4%E6%98%8E/%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80.png)
 
 ## 4 命令总结
 >hexdump命令，查看查看“二进制”文件的十六进制编码，使用
