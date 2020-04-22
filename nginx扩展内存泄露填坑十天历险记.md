@@ -182,4 +182,3 @@ quit # 一定要quit，之前没quit，发现内存不涨了，原来是因为�
 具体的代码commit历史见
 https://github.com/nginx/nginx/commit/0bfb68eea0f41cfbada5a0e86d525027ed2f21e4#diff-f1c885e03b35db291daea583f82574e2
 
-## 7 总结
