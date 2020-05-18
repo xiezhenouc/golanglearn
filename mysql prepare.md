@@ -333,6 +333,23 @@ func (mc *mysqlConn) interpolateParams(query string, args []driver.Value) (strin
 }
 ```
 
+## 3 database/sql和github.com/go-sql-driver/mysql/ 有什么关系？类和类的实现
+```golang
+import "database/sql"
+
+sql包提供了保证SQL或类SQL数据库的泛用接口。
+
+使用sql包时必须注入（至少）一个数据库驱动。参见http://golang.org/s/sqldrivers 获取驱动列表。
+
+MS SQL Server (pure go): https://github.com/denisenkom/go-mssqldb
+MS SQL Server (uses cgo): https://github.com/minus5/gofreetds
+MySQL: https://github.com/go-sql-driver/mysql/ [*]
+MySQL: https://github.com/siddontang/go-mysql/ [**] (also handles replication)
+MySQL: https://github.com/ziutek/mymysql [*]
+
+实现MySQL驱动的有很多，我们用的是 https://github.com/go-sql-driver/mysql/ 这个
+```
+
 ## 参考资料
 ```
 database/sql 一点深入理解 https://michaelyou.github.io/2018/03/30/database-sql-%E4%B8%80%E7%82%B9%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3/
