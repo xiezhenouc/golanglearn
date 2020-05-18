@@ -28,8 +28,11 @@
 
 ## 2 golang中使用?号的是prepare么？InterpolateParams参数的作用是什么？
 >golang测试代码
+
 >先说结论，不一定。
+
 >当InterpolateParams参数如果设置为true，允许驱动进行对sql进行插值，说明不使用prepared statement，且防sql注入。
+
 >当InterpolateParams参数如果设置为false，不允许驱动进行对sql进行插值。
 
 ```golang
@@ -333,6 +336,8 @@ func (mc *mysqlConn) interpolateParams(query string, args []driver.Value) (strin
 ## 参考资料
 ```
 database/sql 一点深入理解 https://michaelyou.github.io/2018/03/30/database-sql-%E4%B8%80%E7%82%B9%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3/
+
 Golang Mysql笔记（三）--- Prepared剖析 https://www.jianshu.com/p/ee0d2e7bef54
+
 MySQL通信协议 https://jin-yang.github.io/post/mysql-protocol.html
 ```
